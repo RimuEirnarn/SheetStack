@@ -4,7 +4,8 @@
 
 > [!NOTE]
 > This tool is intended for power users who are comfortable with shells and CLI/TUI workflows.
-> Also, this application requires Python 3.13
+> Also, this application requires Python 3.13. Availability: Any system that supports unix-like symlinks.
+> (Sorry, Windows users, you must use WSL in this case~)
 
 ---
 
