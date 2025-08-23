@@ -8,11 +8,13 @@ from subprocess import call as subprocess
 
 from props.curseutil import hide_system
 from props.data import ReturnType, status
-from props.config import DEFAULT_PROFILE, DEFAULT_SYMLINK
+from props.config import DEFAULT_PROFILE, DEFAULT_SYMLINK, CONFIG
 from ..component import Component
+
 
 class Server(Component):
     """Run active server"""
+
     should_clear = False
 
     def draw(self, stdscr: window) -> None | ReturnType:
@@ -27,9 +29,27 @@ class Server(Component):
                 status.set("Server mismatch, please manage your server~")
                 return ReturnType.ERR
 
-            min_ram = "2G"
-            max_ram = "4G"
-            args = ['java', f'-Xms{min_ram}', f'-Xmx{max_ram}', '-jar', './server.jar', 'nogui']
+            if not all(
+                map(
+                    lambda val: isinstance(val, (int, tuple)), CONFIG["memory"].values()
+                )
+            ):
+                print(
+                    "Invalid arguments for memory. Either min/max is not a valid number."
+                )
+
+            min_ram = f"{CONFIG['memory']['min']}G"
+            max_ram = f"{CONFIG['memory']['max']}G"
+            gui = "--gui" if CONFIG["gui"] else "--nogui"
+            args = [
+                "java",
+                *CONFIG["additional_args"],
+                f"-Xms{min_ram}",
+                f"-Xmx{max_ram}",
+                "-jar",
+                "./server.jar",
+                gui,
+            ]
             try:
                 rt = subprocess(args)
             except KeyboardInterrupt:

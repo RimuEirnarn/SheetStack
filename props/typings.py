@@ -13,3 +13,14 @@ class VersionBuildRepo(TypedDict):
     project_name: str
     version: str
     builds: list[int]
+
+class Memory(TypedDict):
+    """Memory configuration"""
+    min: int
+    max: int
+class Config(TypedDict):
+    """System configuration"""
+    path: str
+    memory: Memory
+    gui: bool
+    additional_args: list[str]

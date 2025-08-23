@@ -3,7 +3,17 @@
 from pathlib import Path
 from yaml import load, dump, SafeLoader
 
-APP_DIR = Path("~/.server_mgr").expanduser()
+from .typings import Config
+
+CONFIG_DUMMY: Config = {
+    'path': '',
+    "memory": {'min': 2, 'max': 4},
+    'gui': False,
+    'additional_args': []
+}
+
+CONFIG: Config
+APP_DIR = Path("~/.sheetstack").expanduser()
 APP_CACHE_VAULT = APP_DIR / "cache"
 APP_CONFIG = APP_DIR / "config.yaml"
 APP_DIR.mkdir(exist_ok=True)
@@ -11,12 +21,14 @@ APP_CACHE_VAULT.mkdir(exist_ok=True)
 
 if not (APP_CONFIG).exists():
     read_path = input("Please type your designated server directory\n-> ")
+    CONFIG_DUMMY["path"] = str(Path(read_path).resolve(True))
     with open(APP_CONFIG, 'w', encoding='utf-8') as file:
-        dump({'path': str(Path(read_path).absolute())}, file, indent=2)
+        dump(CONFIG_DUMMY, file, indent=2)
+    CONFIG = CONFIG_DUMMY
 else:
     with open(APP_CONFIG, encoding='utf-8') as file:
-        config = load(file, SafeLoader)
-    read_path = config['path']
+        CONFIG = load(file, SafeLoader)
+    read_path = CONFIG['path']
 
 SERVER_PATH = Path(read_path).absolute()
 SERVER_BIN = SERVER_PATH / "bin"
