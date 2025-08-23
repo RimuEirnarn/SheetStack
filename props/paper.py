@@ -1,3 +1,7 @@
+"""Paper related module"""
+
+from os import remove
+from os.path import exists
 from json import loads
 import time
 
@@ -52,6 +56,9 @@ def fetch_minecraft(version: str, build: int):
     filename = SERVER_BIN / GENERIC_FILE.format(version=version, build=build)
     header = head(url, timeout=DEFAULT_TIMEOUT)
     total_size = int(header.headers.get("content-length", 0))
+    if exists(filename):
+        print("This download will overwrite existing file")
+        remove(filename)
     with get(url, stream=True, timeout=DEFAULT_TIMEOUT) as stream, open(filename, 'wb') as file:
         stream.raise_for_status()
         with tqdm(total=total_size, unit="B", unit_scale=True, desc="Downloading") as progress:

@@ -379,6 +379,10 @@ def runner(stdscr: curses.window):
         key = stdscr.getch()
         result = comp.handle_key(key, stdscr)
 
+        if result == ReturnType.RETURN_TO_MAIN:
+            while len(stack) != 1:
+                stack.pop()
+
         if result == ReturnType.EXIT:
             break
 

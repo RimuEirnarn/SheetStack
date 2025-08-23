@@ -5,7 +5,9 @@ import curses
 from os import get_terminal_size
 from typing import Callable, TypeAlias, TypeIs
 
-from .data import ReturnType
+from props.curseutil import clear_line
+
+from .data import ReturnType, status
 
 DefaultCallback: TypeAlias = "Callable[[], ReturnType | Component]"
 WinCallback: TypeAlias = "Callable[[curses.window], ReturnType]"
@@ -17,7 +19,7 @@ def uses_window(fn: "DefaultCallback | WinCallback") -> TypeIs[WinCallback]:
 
 class Component:
     """Base class for all sorts of components"""
-    generic_height: int = 2
+    generic_height: int = 3
     reserved_lines: int = 5
     should_clear: bool = True
     should_init: bool = False
@@ -33,7 +35,7 @@ class Component:
 
     def handle_key(self, key: int, stdscr: curses.window) -> "ReturnType | Component":
         """Handle key component"""
-        if key == 'q': # SHOULD NOT OVERRIDE
+        if key == ord('q'): # SHOULD NOT OVERRIDE
             return ReturnType.EXIT
         fn = self._key_events.get(key, None)
         if callable(fn):
@@ -41,6 +43,12 @@ class Component:
                 return fn(stdscr)
             return fn() # type: ignore
         return ReturnType.CONTINUE
+
+    def show_status(self, stdscr: curses.window):
+        """Show statuses"""
+        height = self.height
+        clear_line(stdscr, height - 1)
+        stdscr.addstr(height -1, 0, status.get())
 
     def syscall(self, stdscr: curses.window) -> ReturnType:
         """Do whatever you want."""

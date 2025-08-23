@@ -14,11 +14,13 @@ class BuildManager(Component):
     """Version Build component"""
 
     should_init = True
+    generic_height = 3
 
     def __init__(self, version: str) -> None:
         super().__init__()
         status.reset()
         self._data: VersionBuildRepo = {}  # type: ignore
+        self._select = 0
         self._version = version
 
         self._key_events = {
@@ -38,6 +40,9 @@ class BuildManager(Component):
             print(f"Installing: PaperMC {self._version}/{build}")
             try:
                 fetch_minecraft(self._version, build)
+            except KeyboardInterrupt:
+                status.set("Download aborted")
+                return ReturnType.RETURN_TO_MAIN
             except Exception as exc: # pylint: disable=broad-exception-caught
                 status.set(f"{type(exc).__name__}: {exc!s}")
                 return ReturnType.ERR
@@ -45,6 +50,7 @@ class BuildManager(Component):
         return ReturnType.RETURN_TO_MAIN
 
     def draw(self, stdscr: window) -> None | ReturnType:
+        self.show_status(stdscr)
         stdscr.addstr(0, 0, COMMON_TEXT)
         builds = tuple(reversed(self._data["builds"]))
         build = builds[self._select]

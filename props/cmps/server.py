@@ -27,12 +27,12 @@ class Server(Component):
                 status.set("Server mismatch, please manage your server~")
                 return ReturnType.ERR
 
-        min_ram = "2G"
-        max_ram = "4G"
-        args = ['java', f'-Xms{min_ram}', f'-Xmx{max_ram}', '-jar', './server.jar', 'nogui']
-        try:
-            rt = subprocess(args)
-        except KeyboardInterrupt:
-            print("Keyboard Interrupt (CTRL+C)!")
+            min_ram = "2G"
+            max_ram = "4G"
+            args = ['java', f'-Xms{min_ram}', f'-Xmx{max_ram}', '-jar', './server.jar', 'nogui']
+            try:
+                rt = subprocess(args)
+            except KeyboardInterrupt:
+                print("Keyboard Interrupt (CTRL+C)!")
             input(f"\n[Return code {rt}] Press enter to return to app... ")
         return ReturnType.OK

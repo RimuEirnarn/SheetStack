@@ -12,6 +12,7 @@ class VersionManager(MenuComponent):
     """Version manager"""
 
     should_init = False
+    generic_height = 3
 
     def __init__(self, selected: str, data: GlobalRepo) -> None:
         super().__init__()

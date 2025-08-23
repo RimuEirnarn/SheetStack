@@ -14,7 +14,7 @@ from .version_group import VersionGroupManager
 from .manager import Manager
 from .server import Server
 from .shell import Shell
-from .halt5s import Halt5s
+# from .halt5s import Halt5s
 from .help import Help
 from .app_exit import Exit
 
@@ -24,13 +24,14 @@ ENTRIES: list[tuple[str, Type[Component]]] = [
     ("Run", Server),
     ("Shell", Shell),
     ("Help", Help),
-    ("Halt 5s", Halt5s),
+    # ("Halt 5s", Halt5s),
     ("Exit", Exit),
 ]
 
 
 class Root(MenuComponent):
     """Root component"""
+
     generic_height = 3
 
     def __init__(self) -> None:
@@ -40,20 +41,23 @@ class Root(MenuComponent):
             curses.KEY_DOWN: self.move_down,
             curses.KEY_ENTER: self.call,
             curses.KEY_RIGHT: self.call,
-            10: self.call
+            10: self.call,
         }
         self._select = 0
 
     def draw(self, stdscr: window):
         version = get_active_version()
+        stdscr.addstr(
+            0,
+            0,
+            "Manage your Minecraft version (↑↓ to navigate, Enter/Right to select):",
+        )
         if version:
             stdscr.addstr(
+                1,
                 0,
-                0,
-                "Manage your Minecraft version (↑↓ to navigate, Enter/Right to select):",
+                f"Current server version: {version.replace('.jar', '').replace('paper-', '')}",
             )
-        if version:
-            stdscr.addstr(1, 0, f"Current server version: {version}")
         stdscr.addstr(self.height - 1, 0, status.get())
 
         for idx, (label, _) in enumerate(ENTRIES):
@@ -61,7 +65,7 @@ class Root(MenuComponent):
             if idx == self._select:
                 style = curses.color_pair(Colors.SELECTED)
 
-            stdscr.addstr(self.generic_height + idx, 0, f'-> {label}\n', style)
+            stdscr.addstr(self.generic_height + idx, 0, f"-> {label}\n", style)
 
     def move_up(self):
         """Move selection UP"""

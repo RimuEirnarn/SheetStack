@@ -17,6 +17,7 @@ from ..data import Colors, ReturnType, status
 
 class Manager(Component):
     """Manage active version"""
+    generic_height = 3
 
     def __init__(self) -> None:
         super().__init__()
@@ -44,6 +45,8 @@ class Manager(Component):
         create_symlink(str(PROFILE_DIR / ver.replace(".jar", "")), str(DEFAULT_PROFILE))
         rt = create_symlink(str(SERVER_BIN / ver), str(DEFAULT_SYMLINK))
         status.set(rt.reason)
+        if rt.type == ReturnType.OK:
+            return ReturnType.BACK
         return rt.type
 
     def move_up(self):
@@ -59,14 +62,18 @@ class Manager(Component):
         return ReturnType.CONTINUE
 
     def draw(self, stdscr: window) -> None | ReturnType:
+        version = get_active_version()
         stdscr.addstr("Select PaperMC version to chose")
+        if version:
+            stdscr.addstr(1, 0, f"Current server version: {version.replace('.jar', '').replace('paper-', '')}")
+        self.show_status(stdscr)
 
         minln, maxln = prepare_windowed(self._select, self.unreserved_lines)
         for idx, (rel_index, ver) in enumerate(windowed(self._installed, minln, maxln)):
             style = 0
-            if rel_index == self._select:
-                style = curses.color_pair(Colors.SELECTED)
             if ver == self._current:
                 style = curses.color_pair(Colors.ACTIVE)
+            if rel_index == self._select:
+                style = curses.color_pair(Colors.SELECTED)
 
             stdscr.addstr(self.generic_height + idx, 0, f"-> {ver}", style)
