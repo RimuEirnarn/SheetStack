@@ -1,7 +1,7 @@
 """Shell mode"""
 
 # pylint: disable=no-member,no-name-in-module
-from os import chdir, readlink
+from os import chdir, readlink, curdir
 from os.path import basename
 from curses import window
 from subprocess import call as subprocess
@@ -19,6 +19,7 @@ class Server(Component):
 
     def draw(self, stdscr: window) -> None | ReturnType:
         rt = -1
+        current_dir = curdir
         with hide_system(stdscr):
             chdir(DEFAULT_PROFILE)
             link = readlink(DEFAULT_PROFILE)
@@ -27,7 +28,7 @@ class Server(Component):
             if not link_name == server_name:
                 print("Mismatch in profile and server file link!")
                 status.set("Server mismatch, please manage your server~")
-                return ReturnType.ERR
+                return ReturnType.ERR_BACK
 
             if not all(
                 map(
@@ -38,7 +39,7 @@ class Server(Component):
                     "Invalid arguments for memory. Either min/max is not a valid number."
                 )
                 status.set("Invalid argument for memory. Please check your configuration")
-                return ReturnType.ERR
+                return ReturnType.ERR_BACK
 
             min_ram = f"{CONFIG['memory']['min']}G"
             max_ram = f"{CONFIG['memory']['max']}G"
@@ -60,4 +61,5 @@ class Server(Component):
             except Exception as exc: # pylint: disable=broad-exception-caught
                 print(f"Failed to run server: {exc}")
             input(f"\n[Return code {rt}] Press enter to return to app... ")
-        return ReturnType.OK if rt == 0 else ReturnType.ERR
+        chdir(current_dir)
+        return ReturnType.BACK if rt == 0 else ReturnType.ERR_BACK

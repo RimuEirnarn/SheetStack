@@ -15,9 +15,10 @@ class ReturnType(IntEnum):
 
     OK = 0
     ERR = 1
-    RETURN_TO_MAIN = 2
-    BACK = 3
-    CONTINUE = 4
+    ERR_BACK = 2
+    RETURN_TO_MAIN = 3
+    BACK = 4
+    CONTINUE = 5
     EXIT = -1
 
 
@@ -40,12 +41,15 @@ class _StatusInfo:
         self._data = " "
 
     def get(self) -> str:
+        """Get current status info"""
         return self._data
 
     def set(self, value: str):
+        """Set status info"""
         self._data = value
 
     def reset(self):
+        """Reset status info"""
         self._data = " "
 
 status = _StatusInfo()
