@@ -37,6 +37,8 @@ class Server(Component):
                 print(
                     "Invalid arguments for memory. Either min/max is not a valid number."
                 )
+                status.set("Invalid argument for memory. Please check your configuration")
+                return ReturnType.ERR
 
             min_ram = f"{CONFIG['memory']['min']}G"
             max_ram = f"{CONFIG['memory']['max']}G"
@@ -55,5 +57,7 @@ class Server(Component):
                 rt = subprocess(args)
             except KeyboardInterrupt:
                 print("Keyboard Interrupt (CTRL+C)!")
+            except Exception as exc: # pylint: disable=broad-exception-caught
+                print(f"Failed to run server: {exc}")
             input(f"\n[Return code {rt}] Press enter to return to app... ")
-        return ReturnType.OK
+        return ReturnType.OK if rt == 0 else ReturnType.ERR
