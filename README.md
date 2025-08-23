@@ -34,7 +34,7 @@
 
 The installation process looks like this:
 
-```
+```bash
 git clone https://github.com/RimuEirnarn/SheetStack
 cd SheetStack
 
