@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Manage your Minecraft server"""
-# pylint: disable=no-member
-from functools import wraps
+# pylint: disable=no-member,assignment-from-no-return
 
 from os import chdir, environ, readlink, get_terminal_size
 from os.path import basename
@@ -9,9 +8,13 @@ from os.path import basename
 from subprocess import call as subprocess
 import curses
 from time import sleep
-from typing import Callable, Type, TypeVar
+from typing import Callable
 
-from props.data import ReturnType, Colors
+from props.errors import ReturnError
+from props.utility import supress, clear_info, windowed, prepare_windowed
+from props.cmps.main import Root
+from props.component import Component
+from props.data import ReturnType, Colors, status
 from props.osutils import (
     create_profile,
     create_symlink,
@@ -23,7 +26,7 @@ from props.paper import fetch_global, fetch_version_info, fetch_minecraft
 from props.typings import GlobalRepo, VersionBuildRepo
 from props.curseutil import clear_line_yield, hide_system
 
-T = TypeVar("T")
+# T = TypeVar("T")
 
 COMMON_TEXT = (
     "Please install which version you wish to install"
@@ -35,47 +38,7 @@ KEY_ENTER = 10
 
 STATUS_INFO = {"0": " "}
 
-
-def clear_info():
-    """erase status info"""
-    STATUS_INFO["0"] = " "
-
-
-def surpress(exclist: tuple[Type[BaseException], ...] | list[Type[BaseException]]):
-    """Surpress incoming errors"""
-
-    def outer(fn: Callable[..., ReturnType]):
-        @wraps(fn)
-        def inner(*args, **kwargs):
-            try:
-                return fn(*args, **kwargs)
-            except BaseException as exc:  # type: ignore # pylint: disable=broad-exception-caught
-                if not type(exc) in exclist:
-                    raise
-                STATUS_INFO["0"] = f"{type(exc).__name__}: {exc!s}"
-                return ReturnType.ERR
-
-        return inner
-
-    return outer
-
-
-def windowed(data: list[T] | tuple[T, ...], start: int, end: int):
-    """Return an enumerated, windowed list based on start and end.
-    Start/end must incorporated values returned by prepare_windowed"""
-    return list(enumerate(data))[start:end]
-
-
-def prepare_windowed(index: int, visible_rows: int):
-    """Return min/max length for windowed function"""
-    minln = max(0, index - (visible_rows // 2))
-    maxln = (
-        visible_rows if index <= (visible_rows // 2) else (index + visible_rows // 2)
-    )
-    return minln, maxln
-
-
-@surpress((ValueError,))
+@supress((ValueError,))
 def select_build(stdscr: curses.window, version: str):
     """Select minecraft build"""
     clear_info()
@@ -135,7 +98,7 @@ def select_build(stdscr: curses.window, version: str):
                     return ReturnType.ERR
 
 
-@surpress([Exception])
+@supress([Exception])
 def select_version_stage2(stdscr: curses.window, selected: str, data: GlobalRepo):
     """Select which minor version"""
     clear_info()
@@ -174,7 +137,7 @@ def select_version_stage2(stdscr: curses.window, selected: str, data: GlobalRepo
             continue
 
 
-@surpress([Exception])
+@supress([Exception])
 def select_version_stage1(stdscr: curses.window):
     """Select which major version"""
     clear_info()
@@ -221,7 +184,7 @@ def select_version_stage1(stdscr: curses.window):
             continue
 
 
-@surpress([Exception])
+@supress([Exception])
 def manage(stdscr: curses.window):
     clear_info()
     metadata = list_versions(str(SERVER_BIN))
@@ -260,7 +223,7 @@ def manage(stdscr: curses.window):
             return rt.type
 
 
-@surpress([Exception])
+@supress([Exception])
 def run_server(stdscr: curses.window):
     """Run active/default server"""
     rt = -1
@@ -284,7 +247,7 @@ def run_server(stdscr: curses.window):
         input(f"\n[Return code {rt}] Press enter to return to app... ")
     return ReturnType.OK
 
-@surpress([Exception])
+@supress([Exception])
 def to_shell(stdscr: curses.window):
     """Return to shell"""
     with hide_system(stdscr):
@@ -293,7 +256,7 @@ def to_shell(stdscr: curses.window):
         input(f"\n[Return code {returncode}] Press enter to return to app... ")
     return ReturnType.OK
 
-@surpress([Exception])
+@supress([Exception])
 def app_help(stdscr: curses.window):
     """App help"""
     while True:
@@ -312,13 +275,13 @@ def app_help(stdscr: curses.window):
             return ReturnType.EXIT
 
 
-@surpress([Exception])
+@supress([Exception])
 def app_exit(_: curses.window):
     """Exit from the app"""
     return ReturnType.EXIT
 
 
-@surpress([ValueError])
+@supress([ValueError])
 def halt5s(stdscr: curses.window):
     """Halt for 5 seconds"""
     clear_info()
@@ -391,10 +354,47 @@ def app(stdscr: curses.window):
             if return_type == ReturnType.EXIT:
                 return
 
+def runner(stdscr: curses.window):
+    """Run the app, must be wrapped"""
+    curses.curs_set(0)
+    curses.start_color()
+    curses.init_pair(
+        Colors.SELECTED, curses.COLOR_BLACK, curses.COLOR_YELLOW
+    )  # Selected
+    curses.init_pair(Colors.ACTIVE, curses.COLOR_GREEN, curses.COLOR_BLACK)  # Active
+    stack: list[Component] = [Root()]
+
+    while stack:
+        comp = stack[-1]
+        if comp.should_init:
+            comp.init(stdscr)
+
+        if comp.should_clear:
+            stdscr.erase()
+        ret = comp.draw(stdscr)
+        if ret in (ReturnType.BACK, ReturnType.OK):
+            stack.pop()
+            continue
+
+        key = stdscr.getch()
+        result = comp.handle_key(key, stdscr)
+
+        if result == ReturnType.EXIT:
+            break
+
+        if result == ReturnType.BACK:
+            stack.pop()
+        elif isinstance(result, Component):
+            try:
+                stack.append(result)
+            except ReturnError as exc:
+                status.set(str(exc))
+        # ReturnType.OK/ERR just continue
 
 def main():
     """MC Server Manager (Paper)"""
-    curses.wrapper(app)
+    # curses.wrapper(app)
+    curses.wrapper(runner)
 
 
 if __name__ == "__main__":
