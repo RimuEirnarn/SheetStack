@@ -30,6 +30,22 @@
 
 ---
 
+## 📥 Installation
+
+The installation process looks like this:
+
+```
+git clone https://github.com/RimuEirnarn/SheetStack
+cd SheetStack
+
+python -m venv .venv
+source .venv/bin/activate
+pip install -r ./requirements.txt
+python main.py # <-- This runs the app
+```
+
+The app will prompt you where the server directory should be.
+
 ## 📜 License
 
 Licensed under the **BSD 3-Clause "New" or "Revised" License**.
