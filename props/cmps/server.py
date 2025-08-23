@@ -23,8 +23,8 @@ class Server(Component):
             chdir(DEFAULT_PROFILE)
             link = readlink(DEFAULT_PROFILE)
             link_name = basename(link)
-            server_name = basename(readlink(DEFAULT_SYMLINK))
-            if not link_name in server_name:
+            server_name = basename(readlink(DEFAULT_SYMLINK)).replace('.jar', '')
+            if not link_name == server_name:
                 print("Mismatch in profile and server file link!")
                 status.set("Server mismatch, please manage your server~")
                 return ReturnType.ERR
