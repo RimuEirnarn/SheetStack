@@ -50,6 +50,7 @@ class Server(Component):
                 "./server.jar",
                 gui,
             ]
+            print(f"Running Minecraft with this args:\n{' '.join(args)}")
             try:
                 rt = subprocess(args)
             except KeyboardInterrupt:
