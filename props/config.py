@@ -22,6 +22,7 @@ APP_CACHE_VAULT.mkdir(exist_ok=True)
 if not (APP_CONFIG).exists():
     read_path = input("Please type your designated server directory\n-> ")
     CONFIG_DUMMY["path"] = str(Path(read_path).resolve(True))
+    print(f"Server directory: {read_path}")
     with open(APP_CONFIG, 'w', encoding='utf-8') as file:
         dump(CONFIG_DUMMY, file, indent=2)
     CONFIG = CONFIG_DUMMY
