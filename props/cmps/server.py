@@ -4,13 +4,12 @@
 from os import chdir, readlink, curdir
 from os.path import basename
 from curses import window
-from subprocess import call as subprocess
+from subprocess import call
 
 from props.curseutil import hide_system
 from props.data import ReturnType, status
-from props.config import DEFAULT_PROFILE, DEFAULT_SYMLINK, CONFIG
+from props.config import DEFAULT_PROFILE, DEFAULT_SYMLINK, read_config
 from ..component import Component
-
 
 class Server(Component):
     """Run active server"""
@@ -20,6 +19,7 @@ class Server(Component):
     def draw(self, stdscr: window) -> None | ReturnType:
         rt = -1
         current_dir = curdir
+        config = read_config()
         with hide_system(stdscr):
             chdir(DEFAULT_PROFILE)
             link = readlink(DEFAULT_PROFILE)
@@ -32,7 +32,7 @@ class Server(Component):
 
             if not all(
                 map(
-                    lambda val: isinstance(val, (int, tuple)), CONFIG["memory"].values()
+                    lambda val: isinstance(val, (int, tuple)), config["memory"].values()
                 )
             ):
                 print(
@@ -41,12 +41,12 @@ class Server(Component):
                 status.set("Invalid argument for memory. Please check your configuration")
                 return ReturnType.ERR_BACK
 
-            min_ram = f"{CONFIG['memory']['min']}G"
-            max_ram = f"{CONFIG['memory']['max']}G"
-            gui = "--gui" if CONFIG["gui"] else "--nogui"
+            min_ram = f"{config['memory']['min']}G"
+            max_ram = f"{config['memory']['max']}G"
+            gui = "--gui" if config["gui"] else "--nogui"
             args = [
                 "java",
-                *CONFIG["additional_args"],
+                *config["additional_args"],
                 f"-Xms{min_ram}",
                 f"-Xmx{max_ram}",
                 "-jar",
@@ -55,7 +55,7 @@ class Server(Component):
             ]
             print(f"Running Minecraft with this args:\n{' '.join(args)}")
             try:
-                rt = subprocess(args)
+                rt = call(args)
             except KeyboardInterrupt:
                 print("Keyboard Interrupt (CTRL+C)!")
             except Exception as exc: # pylint: disable=broad-exception-caught

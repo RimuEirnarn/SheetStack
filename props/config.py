@@ -12,6 +12,7 @@ CONFIG_DUMMY: Config = {
     'additional_args': []
 }
 
+
 CONFIG: Config
 APP_DIR = Path("~/.sheetstack").expanduser()
 APP_CACHE_VAULT = APP_DIR / "cache"
@@ -19,16 +20,24 @@ APP_CONFIG = APP_DIR / "config.yaml"
 APP_DIR.mkdir(exist_ok=True)
 APP_CACHE_VAULT.mkdir(exist_ok=True)
 
+def read_config() -> Config:
+    """Read system config"""
+    with open(APP_CONFIG, encoding='utf-8') as sysfile:
+        return load(sysfile, SafeLoader)
+
+def write_config(config: Config):
+    """Write config"""
+    with open(APP_CONFIG, 'w', encoding='utf-8') as sysfile:
+        dump(config, sysfile)
+
 if not (APP_CONFIG).exists():
     read_path = input("Please type your designated server directory\n-> ")
     CONFIG_DUMMY["path"] = str(Path(read_path).resolve(True))
     print(f"Server directory: {read_path}")
-    with open(APP_CONFIG, 'w', encoding='utf-8') as file:
-        dump(CONFIG_DUMMY, file, indent=2)
+    write_config(CONFIG_DUMMY)
     CONFIG = CONFIG_DUMMY
 else:
-    with open(APP_CONFIG, encoding='utf-8') as file:
-        CONFIG = load(file, SafeLoader)
+    CONFIG = read_config()
     read_path = CONFIG['path']
 
 SERVER_PATH = Path(read_path).absolute()
