@@ -4,7 +4,7 @@
 
 import curses
 
-from ..config import APP_CONFIG
+from ..config import APP_CONFIG, APP_DIR
 from ..data import ReturnType
 from ..component import Component
 
@@ -45,7 +45,7 @@ class Help(Component):
         )
         stdscr.addstr(5, 0, f"{APP_CONFIG}")
         stdscr.addstr(7, 0, "Wanna shortcut?")
-        stdscr.addstr(8, 0, f"cd {APP_CONFIG}")
+        stdscr.addstr(8, 0, f"cd {APP_DIR}")
 
         stdscr.addstr(10, 0, "Keyboard shortcuts: ")
         for index, (key, label) in enumerate(self._keystrokes):
