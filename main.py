@@ -42,7 +42,8 @@ def runner(stdscr: curses.window):
 
         if result == ReturnType.BACK:
             stack.pop()
-        elif isinstance(result, Component):
+
+        if isinstance(result, Component):
             try:
                 stack.append(result)
             except ReturnError as exc:
