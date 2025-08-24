@@ -1,4 +1,5 @@
 """App help component"""
+
 # pylint: disable=no-member
 
 import curses
@@ -20,7 +21,7 @@ class Help(Component):
             ("[ENTER]", "Choose selected entry"),
             ("[UP]", "Move selection up"),
             ("[DOWN]", "Move selection down"),
-            ("[Q]", "Quit")
+            ("[Q]", "Quit"),
         ]
 
     def draw(self, stdscr: curses.window):
@@ -31,7 +32,17 @@ class Help(Component):
         )
         stdscr.addstr(1, 0, "Use [LEFT] to go back.")
 
-        stdscr.addstr(4, 0, "Additionally, you can check your configuration, it's here:")
+        stdscr.addstr(
+            3,
+            0,
+            (
+                "Did you know? The shell options returns you to your shell,"
+                "directed at your server directory"
+            ),
+        )
+        stdscr.addstr(
+            4, 0, "Additionally, you can check your configuration, it's here:"
+        )
         stdscr.addstr(5, 0, f"{APP_CONFIG}")
         stdscr.addstr(7, 0, "Wanna shortcut?")
         stdscr.addstr(8, 0, f"cd {APP_CONFIG}")
