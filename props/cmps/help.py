@@ -36,7 +36,7 @@ class Help(Component):
             3,
             0,
             (
-                "Did you know? The shell options returns you to your shell,"
+                "Did you know? The shell options returns you to your shell, "
                 "directed at your server directory"
             ),
         )
