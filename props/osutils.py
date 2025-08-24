@@ -1,3 +1,4 @@
+"""OS utilities"""
 import os
 from .config import DEFAULT_SYMLINK, PROFILE_DIR
 from .data import ReturnInfo, ReturnType

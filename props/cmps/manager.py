@@ -17,6 +17,7 @@ from ..data import Colors, ReturnType, status
 
 class Manager(Component):
     """Manage active version"""
+
     generic_height = 3
 
     def __init__(self) -> None:
@@ -35,7 +36,7 @@ class Manager(Component):
             curses.KEY_LEFT: self.leave,
             curses.KEY_ENTER: self.select,
             10: self.select,
-            curses.KEY_RIGHT: self.select
+            curses.KEY_RIGHT: self.select,
         }
 
     def select(self):
@@ -65,7 +66,11 @@ class Manager(Component):
         version = get_active_version()
         stdscr.addstr("Select PaperMC version to chose")
         if version:
-            stdscr.addstr(1, 0, f"Current server version: {version.replace('.jar', '').replace('paper-', '')}")
+            stdscr.addstr(
+                1,
+                0,
+                f"Current server version: {version.replace('.jar', '').replace('paper-', '')}",
+            )
         self.show_status(stdscr)
 
         minln, maxln = prepare_windowed(self._select, self.unreserved_lines)

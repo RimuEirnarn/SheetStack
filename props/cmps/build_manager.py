@@ -34,7 +34,7 @@ class BuildManager(Component):
 
     def syscall(self, stdscr: window):
         """Fetch PaperMC"""
-        builds = tuple(reversed(self._data['builds']))
+        builds = tuple(reversed(self._data["builds"]))
         build = builds[self._select]
         with hide_system(stdscr):
             print(f"Installing: PaperMC {self._version}/{build}")
@@ -43,7 +43,7 @@ class BuildManager(Component):
             except KeyboardInterrupt:
                 status.set("Download aborted")
                 return ReturnType.RETURN_TO_MAIN
-            except Exception as exc: # pylint: disable=broad-exception-caught
+            except Exception as exc:  # pylint: disable=broad-exception-caught
                 status.set(f"{type(exc).__name__}: {exc!s}")
                 return ReturnType.ERR
             status.set(f"Installed PaperMC {self._version}-{build}")

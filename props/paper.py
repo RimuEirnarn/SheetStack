@@ -13,7 +13,8 @@ from .config import APP_CACHE_VAULT, SERVER_BIN
 
 REPOSITORY = "https://api.papermc.io/v2/projects/paper"
 VERSION_REPO = "https://api.papermc.io/v2/projects/paper/versions/{version}"
-BUILDS_REPO = "https://api.papermc.io/v2/projects/paper/versions/{version}/builds/{build}/downloads/paper-{version}-{build}.jar"
+BUILDS_REPO = ("https://api.papermc.io/v2/projects/paper/versions/{version}"
+              "/builds/{build}/downloads/paper-{version}-{build}.jar")
 GENERIC_FILE = "paper-{version}-{build}.jar"
 ERR = {}
 
@@ -50,6 +51,7 @@ def fetch_version_info(version: str) -> VersionBuildRepo:
     """Fetch version info"""
     return fetch(VERSION_REPO.format(version=version), f"v{version}.cache")
 
+
 def fetch_minecraft(version: str, build: int):
     """Fetch server jar"""
     url = BUILDS_REPO.format(version=version, build=build)
@@ -59,9 +61,13 @@ def fetch_minecraft(version: str, build: int):
     if exists(filename):
         print("This download will overwrite existing file")
         remove(filename)
-    with get(url, stream=True, timeout=DEFAULT_TIMEOUT) as stream, open(filename, 'wb') as file:
+    with get(url, stream=True, timeout=DEFAULT_TIMEOUT) as stream, open(
+        filename, "wb"
+    ) as file:
         stream.raise_for_status()
-        with tqdm(total=total_size, unit="B", unit_scale=True, desc="Downloading") as progress:
+        with tqdm(
+            total=total_size, unit="B", unit_scale=True, desc="Downloading"
+        ) as progress:
             for chunk in stream.iter_content(DEFAULT_CHUNK_SIZE):
                 if chunk:
                     file.write(chunk)
