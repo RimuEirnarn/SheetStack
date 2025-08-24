@@ -15,6 +15,7 @@ from .manager import Manager
 from .server import Server
 from .shell import Shell
 # from .halt5s import Halt5s
+from .app_settings import Settings
 from .help import Help
 from .app_exit import Exit
 
@@ -23,6 +24,7 @@ ENTRIES: list[tuple[str, Type[Component]]] = [
     ("Select version", Manager),
     ("Run", Server),
     ("Shell", Shell),
+    ("App Settings", Settings),
     ("Help", Help),
     # ("Halt 5s", Halt5s),
     ("Exit", Exit),

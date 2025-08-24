@@ -22,6 +22,7 @@ class Memory(TypedDict):
 class Config(TypedDict):
     """System configuration"""
     path: str
+    java_path: str
     memory: Memory
     gui: bool
     additional_args: list[str]

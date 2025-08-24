@@ -45,7 +45,7 @@ class Server(Component):
             max_ram = f"{config['memory']['max']}G"
             gui = "--gui" if config["gui"] else "--nogui"
             args = [
-                "java",
+                config["java_path"],
                 *config["additional_args"],
                 f"-Xms{min_ram}",
                 f"-Xmx{max_ram}",

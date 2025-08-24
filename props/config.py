@@ -9,7 +9,8 @@ CONFIG_DUMMY: Config = {
     'path': '',
     "memory": {'min': 2, 'max': 4},
     'gui': False,
-    'additional_args': []
+    'additional_args': [],
+    'java_path': 'java'
 }
 
 
