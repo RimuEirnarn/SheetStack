@@ -1,3 +1,4 @@
+"""Typing modules"""
 from typing import TypedDict
 
 class GlobalRepo(TypedDict):
