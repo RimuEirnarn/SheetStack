@@ -1,7 +1,7 @@
 """Shell mode"""
 
 # pylint: disable=no-member,no-name-in-module
-from os import chdir, readlink, curdir
+from os import chdir, readlink, getcwd
 from os.path import basename
 from curses import window
 from subprocess import call
@@ -18,7 +18,7 @@ class Server(Component):
 
     def draw(self, stdscr: window) -> None | ReturnType:
         rt = -1
-        current_dir = curdir
+        current_dir = getcwd()
         config = read_config()
         with hide_system(stdscr):
             chdir(DEFAULT_PROFILE)
