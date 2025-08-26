@@ -23,7 +23,7 @@
 
 ### ▶️ Simple Runner
 
-- Launch your active server directly from the TUI.
+- Launch your active server directly from the TUI. Make sure that you already have Java installed on your system.
 
 ### 🖥️ Minimalist UI
 
